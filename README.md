@@ -22,7 +22,7 @@ quant-trading-system/
 ├── 05_sentiment_analysis/
 ├── notebooks/
 ├── utils/
-├── .env
+├── .env/
 ├── requirements.txt
 ├── README.md
 └── LICENSE
