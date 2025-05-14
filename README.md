@@ -15,17 +15,18 @@
 
 ```
 quant-trading-system/
-├── 01_data_collection/
-├── 02_data_analysis/
-├── 03_strategy/
-├── 04_api_trading/
-├── 05_sentiment_analysis/
-├── notebooks/
-├── utils/
-├── .env/
-├── requirements.txt
-├── README.md
-└── LICENSE
+|-- 01_data_collection/
+|-- 02_data_analysis/
+|-- 03_strategy/
+|-- 04_api_trading/
+|-- 05_sentiment_analysis/
+|-- notebooks/
+|-- utils/
+|-- .env
+|-- .venv/
+|-- requirements.txt
+|-- README.md
+|-- LICENSE
 ```
 
 ## Installation
@@ -39,6 +40,12 @@ pip install -r requirements.txt
 ## Getting Started
 
 Explore the notebooks in the `notebooks/` folder or begin implementing trading strategies in `03_strategy/`.
+
+# API Key Setup
+
+Create a `.env` file in the root directory using the `.env.example` template and insert your API key:
+
+ALPHA_API_KEY=your_actual_api_key
 
 ## License
 
