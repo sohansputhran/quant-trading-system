@@ -21,7 +21,7 @@ def plot_macd(data, ticker):
     """
     Plot MACD and Signal Line
     """
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(15, 8))
     ax.plot(data['MACD'], label='MACD', color='blue')
     ax.plot(data['Signal Line'], label='Signal Line', color='red')
     ax.set(title=f"MACD for {ticker}", xlabel="Date", ylabel="MACD")
