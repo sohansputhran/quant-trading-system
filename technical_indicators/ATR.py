@@ -18,7 +18,6 @@ def ATR_plot(df, ticker, period=14):
     """
     Plot ATR
     """
-    # df['ATR'] = implement_ATR(df, period)
     plt.figure(figsize=(12, 6))
     plt.plot(df.index, df['ATR'], label='ATR', color='blue')
     plt.title(f'Average True Range (ATR) for {ticker}')
