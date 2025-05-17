@@ -1,6 +1,9 @@
 # Implementing the Performance Measurements
 # This module contains functions to calculate various performance metrics for financial data.
 
+# Import necessary libraries
+import numpy as np
+
 # Implementation of Cumulative Annual Growth Rate (CAGR)
 def CAGR(df, period=1):
     """
@@ -22,3 +25,20 @@ def CAGR(df, period=1):
     # Return the CAGR value
     return cagr
 
+def Volatility(df):
+    """
+    Calculate the volatility of a stock based on its historical data.
+    
+    Parameters:
+    df (pd.DataFrame): DataFrame containing the OHLCV data for the stock.
+
+    Returns:
+    float: The volatility of the specified stock.
+    """
+    # Calculate daily returns
+    daily_returns = df['Close'].pct_change()
+    
+    # Calculate annualized volatility
+    volatility = daily_returns.std() * np.sqrt(252)
+    
+    return volatility
