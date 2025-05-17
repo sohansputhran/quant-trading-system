@@ -4,7 +4,6 @@
 # Import necessary libraries
 import numpy as np
 
-# Implementation of Cumulative Annual Growth Rate (CAGR)
 def CAGR(df, period=1):
     """
     Calculate the Cummulative Annual Growth Rate (CAGR) of a given DataFrame.
@@ -42,3 +41,47 @@ def Volatility(df):
     volatility = daily_returns.std() * np.sqrt(252)
     
     return volatility
+
+def Sharpe_Ratio(df, risk_free_rate=0.01):
+    """
+    Calculate the Sharpe Ratio of a stock based on its historical data.
+    
+    Parameters:
+    df (pd.DataFrame): DataFrame containing the OHLCV data for the stock.
+    risk_free_rate (float): The risk-free rate to use in the calculation.
+
+    Returns:
+    float: The Sharpe Ratio of the specified stock.
+    """
+    # Calculate daily returns
+    daily_returns = df['Close'].pct_change()
+    
+    # Calculate excess returns
+    excess_returns = daily_returns - risk_free_rate / 252
+    
+    # Calculate annualized Sharpe Ratio
+    sharpe_ratio = (excess_returns.mean() / excess_returns.std()) * np.sqrt(252)
+    
+    return sharpe_ratio
+
+def Sortino_Ratio(df, target_return=0):
+    """
+    Calculate the Sortino Ratio of a stock based on its historical data.
+    
+    Parameters:
+    df (pd.DataFrame): DataFrame containing the OHLCV data for the stock.
+    target_return (float): The target return to use in the calculation.
+
+    Returns:
+    float: The Sortino Ratio of the specified stock.
+    """
+    # Calculate daily returns
+    daily_returns = df['Close'].pct_change()
+    
+    # Calculate downside returns
+    downside_returns = daily_returns[daily_returns < target_return]
+    
+    # Calculate annualized Sortino Ratio
+    sortino_ratio = (daily_returns.mean() - target_return) / downside_returns.std() * np.sqrt(252)
+    
+    return sortino_ratio
