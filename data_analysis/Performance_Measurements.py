@@ -85,3 +85,45 @@ def Sortino_Ratio(df, target_return=0):
     sortino_ratio = (daily_returns.mean() - target_return) / downside_returns.std() * np.sqrt(252)
     
     return sortino_ratio
+
+def Maximum_Drawdown(df):
+    """
+    Calculate the Maximum Drawdown of a stock based on its historical data.
+
+    Parameters:
+    df (pd.DataFrame): DataFrame containing the OHLCV data for the stock.
+
+    Returns:
+    float: The Maximum Drawdown of the specified stock.
+    """
+    # Calculate daily returns
+    daily_returns = df['Close'].pct_change()
+
+    # Calculate cumulative returns
+    cumulative_returns = (1 + daily_returns).cumprod()
+
+    # Calculate maximum drawdown
+    max_drawdown = (cumulative_returns / cumulative_returns.cummax() - 1).min()
+
+    return max_drawdown
+
+def Calmar_Ratio(df):
+    """
+    Calculate the Calmar Ratio of a stock based on its historical data.
+
+    Parameters:
+    df (pd.DataFrame): DataFrame containing the OHLCV data for the stock.
+
+    Returns:
+    float: The Calmar Ratio of the specified stock.
+    """
+    # Calculate daily returns
+    daily_returns = df['Close'].pct_change()
+
+    # Calculate maximum drawdown
+    max_drawdown = Maximum_Drawdown(df)
+
+    # Calculate annualized Calmar Ratio
+    calmar_ratio = daily_returns.mean() / abs(max_drawdown)
+
+    return calmar_ratio
