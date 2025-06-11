@@ -11,7 +11,6 @@ sys.path.append(os.path.abspath(".."))
 from utils.config import NEWS_API_KEY
 
 API_KEY = NEWS_API_KEY
-QUERY = "FDA OR earnings OR acquisition OR upgrade OR contract"
 # 100 is the maximum page size for NewsAPI
 LIMIT = 100
 
@@ -84,3 +83,13 @@ def build_catalyst_news_list():
     else:
         df.to_csv(FILE_PATH, index=False)
         print(f"Created new file: {FILE_PATH}")
+
+if __name__ == "__main__":
+    print("Starting catalyst news collection...")
+    if not API_KEY:
+        print("❌ NEWS_API_KEY is not set. Please check your config.")
+        sys.exit(1)
+    print(f"Using API_KEY: {API_KEY[:4]}... (truncated for security)")
+    
+    build_catalyst_news_list()
+    print("Catalyst news collection completed.")

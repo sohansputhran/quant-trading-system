@@ -3,17 +3,37 @@ import json
 import pandas as pd
 
 # URLs for exchange symbol lists
-url_nasdaq = "https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/nasdaq/nasdaq_tickers.json"
-url_nyse   = "https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/nyse/nyse_tickers.json"
-# url_amex   = "https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/amex/amex_tickers.json"
+sources = {
+    "nasdaq": "https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/nasdaq/nasdaq_full_tickers.json",
+    "nyse": "https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/nyse/nyse_full_tickers.json",
+    "amex": "https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/amex/amex_full_tickers.json"
+}
 
-def load_symbols(url):
-    return json.loads(requests.get(url).text)
+def fetch_all_tickers():
+    records = []
 
-# Combine ticker symbols
-tickers = set(load_symbols(url_nasdaq) + load_symbols(url_nyse)) # + load_symbols(url_amex))
+    for exchange, url in sources.items():
+        print(f"Fetching from {exchange.upper()}...")
+        res = requests.get(url)
+        if res.status_code == 200:
+            data = res.json()
+            # print(data[:5])  # Print first 5 entries for debugging
+            for entry in data:
+                records.append({
+                    "ticker": entry.get("symbol", ""),
+                    "name": entry.get("name", ""),
+                    "exchange": exchange.upper()
+                })
+        else:
+            print(f"❌ Failed to fetch from {exchange.upper()} ({res.status_code})")
 
-# Save to CSV
-df = pd.DataFrame({"symbol": sorted(tickers)})
-df.to_csv("../data/tickers.csv", index=False)
-print(f"✅ Saved {len(tickers)} unique tickers to data/tickers.csv")
+    df = pd.DataFrame(records).drop_duplicates(subset="ticker")
+    df = df[df["ticker"].str.isupper()]  # Filter clean tickers
+    
+    output_path = "../data/tickers.csv"
+    df.to_csv(output_path, index=False)
+    print(f"✅ Saved {len(df)} tickers to: {output_path}")
+
+if __name__ == "__main__":
+    fetch_all_tickers()
+    print("Ticker fetching complete!")
