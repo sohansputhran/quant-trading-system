@@ -16,32 +16,41 @@ sys.path.append(os.path.abspath(".."))
 # Import the API_KEY from your config module
 from utils.config import ALPHA_API_KEY
 
-# extracting data for a single ticker
-ts = TimeSeries(key=ALPHA_API_KEY, output_format='pandas')
-data = ts.get_daily(symbol='EURUSD', outputsize='full')[0]
-data.columns = ["open","high","low","close","volume"]
-data = data.iloc[::-1]
-
-# extracting stock data (historical close price) for multiple stocks
-all_tickers = ["AAPL","MSFT","CSCO","AMZN","GOOG","TSLA","META","NFLX","NVDA","AMD","INTC","IBM","ORCL","QCOM","CRM","ADBE","CSX","TXN","AVGO","AMAT","INTU"]
-close_prices = pd.DataFrame()
-api_call_count = 1
-ts = TimeSeries(key=ALPHA_API_KEY, output_format='pandas')
-start_time = time.time()
-for ticker in all_tickers:
-    print(f"Fetching data for {ticker}...")
-    # Fetch intraday data for the ticker
-    data = ts.get_intraday(symbol=ticker,interval='1min', outputsize='compact')[0]
-    # Check if the API call limit has been reached
-    api_call_count+=1
+def main():
+    """ Main function to collect data from Alpha Vantage and store it in a pandas DataFrame.
+    This script collects daily data for a single ticker (EURUSD) and intraday data for multiple stocks.
+    It stores the data in a pandas DataFrame and prints the DataFrame.
+    """
+    # extracting data for a single ticker
+    ts = TimeSeries(key=ALPHA_API_KEY, output_format='pandas')
+    data = ts.get_daily(symbol='EURUSD', outputsize='full')[0]
     data.columns = ["open","high","low","close","volume"]
-    # Reverse the order of the data to have it in chronological order
     data = data.iloc[::-1]
-    # Add the close prices to the DataFrame
-    close_prices[ticker] = data["close"]
-    # Check if the API call limit has been reached
-    if api_call_count==5:
-        print("API call limit reached, sleeping for 60 seconds...")
-        # Sleep for 60 seconds to avoid hitting the API call limit
-        api_call_count = 1
-        time.sleep(60 - ((time.time() - start_time) % 60.0))
+
+    # extracting stock data (historical close price) for multiple stocks
+    all_tickers = ["AAPL","MSFT","CSCO","AMZN","GOOG","TSLA","META","NFLX","NVDA","AMD","INTC","IBM","ORCL","QCOM","CRM","ADBE","CSX","TXN","AVGO","AMAT","INTU"]
+    close_prices = pd.DataFrame()
+    api_call_count = 1
+    ts = TimeSeries(key=ALPHA_API_KEY, output_format='pandas')
+    start_time = time.time()
+
+    for ticker in all_tickers:
+        print(f"Fetching data for {ticker}...")
+        # Fetch intraday data for the ticker
+        data = ts.get_intraday(symbol=ticker,interval='1min', outputsize='compact')[0]
+        # Check if the API call limit has been reached
+        api_call_count+=1
+        data.columns = ["open","high","low","close","volume"]
+        # Reverse the order of the data to have it in chronological order
+        data = data.iloc[::-1]
+        # Add the close prices to the DataFrame
+        close_prices[ticker] = data["close"]
+        # Check if the API call limit has been reached
+        if api_call_count==5:
+            print("API call limit reached, sleeping for 60 seconds...")
+            # Sleep for 60 seconds to avoid hitting the API call limit
+            api_call_count = 1
+            time.sleep(60 - ((time.time() - start_time) % 60.0))
+
+if __name__ == "__main__":
+    main()

@@ -35,5 +35,6 @@ def fetch_all_tickers():
     print(f"✅ Saved {len(df)} tickers to: {output_path}")
 
 if __name__ == "__main__":
+    print("Starting ticker fetching...")
     fetch_all_tickers()
     print("Ticker fetching complete!")

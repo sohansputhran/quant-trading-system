@@ -87,7 +87,7 @@ def build_catalyst_news_list():
 if __name__ == "__main__":
     print("Starting catalyst news collection...")
     if not API_KEY:
-        print("❌ NEWS_API_KEY is not set. Please check your config.")
+        print("NEWS_API_KEY is not set. Please check your config.")
         sys.exit(1)
     print(f"Using API_KEY: {API_KEY[:4]}... (truncated for security)")
     
