@@ -14,10 +14,10 @@ import os
 sys.path.append(os.path.abspath(".."))
 
 # Import the API_KEY from your config module
-from utils.config import API_KEY
+from utils.config import ALPHA_API_KEY
 
 # extracting data for a single ticker
-ts = TimeSeries(key=API_KEY, output_format='pandas')
+ts = TimeSeries(key=ALPHA_API_KEY, output_format='pandas')
 data = ts.get_daily(symbol='EURUSD', outputsize='full')[0]
 data.columns = ["open","high","low","close","volume"]
 data = data.iloc[::-1]
@@ -26,7 +26,7 @@ data = data.iloc[::-1]
 all_tickers = ["AAPL","MSFT","CSCO","AMZN","GOOG","TSLA","META","NFLX","NVDA","AMD","INTC","IBM","ORCL","QCOM","CRM","ADBE","CSX","TXN","AVGO","AMAT","INTU"]
 close_prices = pd.DataFrame()
 api_call_count = 1
-ts = TimeSeries(key=API_KEY, output_format='pandas')
+ts = TimeSeries(key=ALPHA_API_KEY, output_format='pandas')
 start_time = time.time()
 for ticker in all_tickers:
     print(f"Fetching data for {ticker}...")
