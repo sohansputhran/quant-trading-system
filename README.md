@@ -11,24 +11,6 @@
 - Perform sentiment analysis
 - Visualize time series data
 
-## Project Structure
-
-```
-quant-trading-system/
-|-- 01_data_collection/
-|-- 02_data_analysis/
-|-- 03_strategy/
-|-- 04_api_trading/
-|-- 05_sentiment_analysis/
-|-- notebooks/
-|-- utils/
-|-- .env
-|-- .venv/
-|-- requirements.txt
-|-- README.md
-|-- LICENSE
-```
-
 ## Installation
 
 ```bash
