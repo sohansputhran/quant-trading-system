@@ -16,6 +16,9 @@ QUERY = "FDA OR earnings OR acquisition OR upgrade OR contract"
 LIMIT = 100
 # date_str = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
+FILENAME = f"catalyst_news_{datetime.now().strftime('%Y-%m-%d')}.csv"
+FILE_PATH = os.path.join("../data/", FILENAME)
+
 # Function to get the current time in Zulu (UTC) ISO 8601 format for the newsapi query
 # def get_current_zulu_time():
 #     """Returns the current time in Zulu (UTC) ISO 8601 format."""
@@ -55,6 +58,13 @@ def build_catalyst_news_list():
             "url": a.get("url")
         })
     df = pd.DataFrame(rows)
-    out = f"../data/catalyst_news_{datetime.now().strftime('%Y-%m-%d')}.csv"
-    df.to_csv(out, index=False)
-    print("Saved:", out)
+    
+    # Append to existing file or create new one
+    if os.path.exists(FILE_PATH):
+        df_existing = pd.read_csv(FILE_PATH)
+        df_combined = pd.concat([df_existing, df]).drop_duplicates()
+        df_combined.to_csv(FILE_PATH, index=False)
+        print(f"Appended to existing file: {FILE_PATH}")
+    else:
+        df.to_csv(FILE_PATH, index=False)
+        print(f"Created new file: {FILE_PATH}")
