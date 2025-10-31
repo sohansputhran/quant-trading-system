@@ -28,13 +28,13 @@ fig = go.Figure()
 fig.add_trace(go.Scatter(x=df["Date"], y=df["Strategy"], name="Strategy", line=dict(color="#1f77b4", width=2)))
 fig.add_trace(go.Scatter(x=df["Date"], y=df["Benchmark"], name="Benchmark", line=dict(color="gray", width=1, dash="dash")))
 fig.update_layout(title="Cumulative Returns: Strategy vs Benchmark", xaxis_title="Date", yaxis_title="Cumulative Return", height=500)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 c1, c2 = st.columns(2)
 with c1:
     st.subheader("📊 Returns Distribution")
-    st.plotly_chart(px.histogram(ret, nbins=50, labels={"value": "Daily Returns", "count": "Frequency"}).update_layout(showlegend=False, height=300), use_container_width=True)
+    st.plotly_chart(px.histogram(ret, nbins=50, labels={"value": "Daily Returns", "count": "Frequency"}).update_layout(showlegend=False, height=300), width='stretch')
 with c2:
     st.subheader("📈 Monthly Returns")
     monthly = {"Month": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"], "Return": [2.3,-0.5,3.1,1.8,-1.2,2.7,1.5,3.4,0.9]}
-    st.plotly_chart(px.bar(monthly, x="Month", y="Return", color="Return", color_continuous_scale=["red","green"]).update_layout(height=300, showlegend=False), use_container_width=True)
+    st.plotly_chart(px.bar(monthly, x="Month", y="Return", color="Return", color_continuous_scale=["red","green"]).update_layout(height=300, showlegend=False), width='stretch')

@@ -39,11 +39,11 @@ with c2:
             "Portfolio rebalanced",
         ],
     })
-    st.dataframe(activity, hide_index=True, use_container_width=True)
+    st.dataframe(activity, hide_index=True, width='stretch')
 
 st.markdown("---")
 st.subheader("💼 Portfolio Allocation")
 allocation = pd.DataFrame({"Asset": ["Equities", "Forex", "Crypto", "Cash"], "Allocation": [45, 30, 15, 10]})
 fig = px.pie(allocation, values="Allocation", names="Asset", color_discrete_sequence=px.colors.sequential.Blues_r)
 fig.update_layout(height=400)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
