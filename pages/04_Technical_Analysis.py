@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from qts.data.prices import fetch_yf_prices, fetch_alpaca_intraday, ensure_ohlcv, resample_bars
+from qts.data.prices import fetch_yf_prices, ensure_ohlcv, resample_bars
 from qts.analysis.indicators import compute_indicators
 
 st.set_page_config(page_title="Technical Analysis", page_icon="📈", layout="wide")
@@ -40,7 +40,7 @@ def _load_data(symbol, source, period, interval, tf, start, end):
 df = _load_data(symbol, source, period, interval, tf, start, end)
 
 dfi = compute_indicators(df, {"sma": int(sma), "ema": int(ema), "rsi": int(rsi)})
-print(dfi.head())
+
 # For the candlestick patterns in the chart
 def normalize_ohlcv_from_yf_multi(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
@@ -96,15 +96,14 @@ fig.add_trace(go.Candlestick(
 fig.update_layout(xaxis_rangeslider_visible=False, height=500, margin=dict(l=10,r=10,t=30,b=10))
 fig.add_trace(go.Scatter(x=dfi.index, y=dfi[f"SMA_{int(sma)}"], mode="lines", name=f"SMA {int(sma)}"))
 fig.add_trace(go.Scatter(x=dfi.index, y=dfi[f"EMA_{int(ema)}"], mode="lines", name=f"EMA {int(ema)}"))
-st.plotly_chart(fig, use_container_width=True)
 
-# col1, col2 = st.columns([3,1])
-# with col1:
-#     st.plotly_chart(fig, use_container_width=True)
-# with col2:
-#     st.metric("Last Close", f"{dfi['Close'].iloc[-1]:,.2f}")
-#     delta = dfi["Close"].iloc[-1] / dfi["Close"].iloc[0] - 1
-#     st.metric("Period Return", f"{delta*100:,.2f}%")
+col1, col2 = st.columns([3,1])
+with col1:
+    st.plotly_chart(fig, use_container_width=True)
+with col2:
+    st.metric("Last Close", f"{dfi['Close'].iloc[-1]:,.2f}")
+    delta = dfi["Close"].iloc[-1] / dfi["Close"].iloc[0] - 1
+    st.metric("Period Return", f"{delta*100:,.2f}%")
 
 # --- RSI + MACD
 r1, r2 = st.columns(2)
