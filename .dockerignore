@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Data / artifacts / notebooks cache
+data/
+artifacts/
+outputs/
+mlruns/
+*.parquet
+*.feather
+*.csv
+*.log
+
+# Env
+.env
+.env.*
