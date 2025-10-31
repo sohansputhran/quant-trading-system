@@ -83,7 +83,7 @@ def normalize_ohlcv_from_yf_multi(df: pd.DataFrame) -> pd.DataFrame:
 
 pxdf = normalize_ohlcv_from_yf_multi(dfi)
 
-# --- Price chart (candles + SMA/EMA)
+# Price chart (candles + SMA/EMA)
 fig = go.Figure()
 fig.add_trace(go.Candlestick(
     x=pxdf.index,
@@ -97,15 +97,15 @@ fig.update_layout(xaxis_rangeslider_visible=False, height=500, margin=dict(l=10,
 fig.add_trace(go.Scatter(x=dfi.index, y=dfi[f"SMA_{int(sma)}"], mode="lines", name=f"SMA {int(sma)}"))
 fig.add_trace(go.Scatter(x=dfi.index, y=dfi[f"EMA_{int(ema)}"], mode="lines", name=f"EMA {int(ema)}"))
 
-col1, col2 = st.columns([3,1])
+col1, col2 = st.columns([7,1])
 with col1:
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 with col2:
     st.metric("Last Close", f"{dfi['Close'].iloc[-1]:,.2f}")
     delta = dfi["Close"].iloc[-1] / dfi["Close"].iloc[0] - 1
     st.metric("Period Return", f"{delta*100:,.2f}%")
 
-# --- RSI + MACD
+# RSI + MACD
 r1, r2 = st.columns(2)
 with r1:
     st.subheader("RSI")
@@ -116,7 +116,7 @@ with r2:
     st.line_chart(macd_df[["MACD","MACD_signal"]], height=200)
     st.bar_chart(macd_df[["MACD_hist"]], height=200)
 
-# --- Data table + download
+# Data table + download
 with st.expander("Raw Data", expanded=False):
     st.dataframe(dfi.tail(500))
     csv = dfi.to_csv(index=True).encode()

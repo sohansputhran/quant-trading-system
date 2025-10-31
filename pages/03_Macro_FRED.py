@@ -44,14 +44,14 @@ if go_btn:
             st.success(f"Loaded {len(codes)} series. Rows: {len(tf_df)}")
 
             st.subheader("Data Preview")
-            st.dataframe(tf_df.tail(200), use_container_width=True)
+            st.dataframe(tf_df.tail(200), width='stretch')
 
             st.subheader("Chart")
             fig = go.Figure()
             for col in tf_df.columns:
                 fig.add_trace(go.Scatter(x=tf_df.index, y=tf_df[col], mode="lines", name=col))
             fig.update_layout(height=520, margin=dict(t=30, l=10, r=10, b=10))
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
             c1, c2 = st.columns(2)
             c1.download_button("Download transformed CSV", tf_df.to_csv(index=True).encode("utf-8"),

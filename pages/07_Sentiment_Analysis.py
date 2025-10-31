@@ -26,7 +26,7 @@ with tab1:
     fig.add_trace(go.Bar(x=sentiment["Date"], y=sentiment["Sentiment"], marker_color=colors, name="Sentiment"))
     fig.add_hline(y=0, line_dash="dash", line_color="gray")
     fig.update_layout(title="Daily News Sentiment Score", xaxis_title="Date", yaxis_title="Sentiment", height=400)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     st.subheader("Top News Headlines")
     news = pd.DataFrame({
@@ -41,17 +41,17 @@ with tab1:
         "Score": [0.85,0.72,0.15,0.68,0.91],
         "Source": ["Reuters","Bloomberg","CNBC","WSJ","CoinDesk"],
     })
-    st.dataframe(news, hide_index=True, use_container_width=True)
+    st.dataframe(news, hide_index=True, width='stretch')
 
 with tab2:
     st.subheader("💬 Social Media Sentiment")
     c1, c2 = st.columns(2)
     with c1:
         platforms = pd.DataFrame({"Platform": ["Twitter","Reddit","StockTwits","Discord"], "Posts": [12450, 3280, 5620, 1890]})
-        st.plotly_chart(px.pie(platforms, values="Posts", names="Platform", title="Posts by Platform").update_layout(height=300), use_container_width=True)
+        st.plotly_chart(px.pie(platforms, values="Posts", names="Platform", title="Posts by Platform").update_layout(height=300), width='stretch')
     with c2:
         tickers = pd.DataFrame({"Ticker": ["AAPL","TSLA","NVDA","MSFT","GOOGL"], "Mentions": [4520,3840,2960,2450,1980], "Sentiment": [0.68,0.72,0.81,0.65,0.58]})
-        st.plotly_chart(px.bar(tickers, x="Ticker", y="Mentions", color="Sentiment", color_continuous_scale=["red","yellow","green"], title="Most Mentioned Tickers").update_layout(height=300), use_container_width=True)
+        st.plotly_chart(px.bar(tickers, x="Ticker", y="Mentions", color="Sentiment", color_continuous_scale=["red","yellow","green"], title="Most Mentioned Tickers").update_layout(height=300), width='stretch')
 
 with tab3:
     st.subheader("📊 Technical Sentiment Indicators")
@@ -61,4 +61,4 @@ with tab3:
         "Signal": ["Bullish", "Bullish", "Low Volatility", "Bullish", "Bullish"],
         "Change": ["↑ +5", "↓ -0.08", "↓ -1.2", "↑ +0.15", "↑"],
     })
-    st.dataframe(indicators, hide_index=True, use_container_width=True)
+    st.dataframe(indicators, hide_index=True, width='stretch')

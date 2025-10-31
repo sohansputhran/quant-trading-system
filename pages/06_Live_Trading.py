@@ -25,7 +25,7 @@ with t1:
         "P&L": ["+$162.50","+$75.00","+$320.00","+$172.00","+$625.00"],
         "P&L %": ["+1.85%","+1.79%","+0.29%","+1.05%","+2.04%"],
     })
-    st.dataframe(positions, hide_index=True, use_container_width=True)
+    st.dataframe(positions, hide_index=True, width='stretch')
 
 with t2:
     st.subheader("📜 Recent Trades")
@@ -37,7 +37,7 @@ with t2:
         "Price": ["$175.20","$139.80","$410.30","1.0920","$268.50","$61,200","$177.80","$181.40","$482.90","$3,180"],
         "P&L": ["-","-","+$45.00","-","+$180.00","-","+$52.00","-","-","+$60.00"],
     })
-    st.dataframe(trades, hide_index=True, use_container_width=True)
+    st.dataframe(trades, hide_index=True, width='stretch')
 
 with t3:
     st.subheader("📋 Pending Orders")
@@ -49,4 +49,4 @@ with t3:
         "Target Price": ["$172.00","$260.00","1.1000","$475.00"],
         "Status": ["Pending","Pending","Pending","Pending"],
     })
-    st.dataframe(orders, hide_index=True, use_container_width=True)
+    st.dataframe(orders, hide_index=True, width='stretch')
