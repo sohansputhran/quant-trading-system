@@ -5,4 +5,4 @@ from .app_utils import (
     generate_sample_price_data,
     generate_sample_strategy_data,
 )
-from .fred_utils import fetch_series, fred_fetch_many, fred_transform, fred_key_loaded
+from .fred_utils import fred_fetch_many, fred_transform, fred_key_loaded
