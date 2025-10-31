@@ -1,9 +1,19 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.graph_objects as go
-import plotly.express as px
+
+import os
 from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
+
+# New imports for FRED support
+from dotenv import load_dotenv, find_dotenv
+from fredapi import Fred
+
+# Load .env so FRED_API_KEY is available regardless of CWD
+load_dotenv(find_dotenv(usecwd=True))
 
 # Page configuration
 st.set_page_config(
@@ -37,11 +47,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar navigation
+# Sidebar navigation  (added "Macro (FRED)")
 st.sidebar.title("📊 Navigation")
 page = st.sidebar.radio(
     "Select Page",
-    ["Overview", "Data Pipeline", "Technical Analysis", "Strategy Performance", "Live Trading", "Sentiment Analysis"]
+    ["Overview", "Data Pipeline", "Macro (FRED)", "Technical Analysis", "Strategy Performance", "Live Trading", "Sentiment Analysis"]
 )
 
 st.sidebar.markdown("---")
@@ -51,7 +61,9 @@ st.sidebar.info(
     "integrating data extraction, analysis, backtesting, and live trading."
 )
 
-# Helper function to generate sample data
+# ----------------------
+# Helpers & sample data
+# ----------------------
 @st.cache_data
 def generate_sample_price_data(days=365):
     dates = pd.date_range(end=datetime.now(), periods=days, freq='D')
@@ -73,7 +85,46 @@ def generate_sample_strategy_data(days=365):
         'Benchmark': benchmark
     })
 
+# ----------------------
+# FRED helpers
+# ----------------------
+FRED_API_KEY = os.getenv("FRED_API_KEY", "")
+
+FRED_PRESETS = {
+    "CPI (All Urban Consumers)": "CPIAUCSL",
+    "Unemployment Rate": "UNRATE",
+    "Effective Fed Funds Rate": "FEDFUNDS",
+    "Industrial Production Index": "INDPRO",
+    "10Y Treasury Constant Maturity": "DGS10",
+}
+
+@st.cache_data(ttl=60*60)
+def fred_fetch_many(api_key: str, codes, start=None, end=None) -> pd.DataFrame:
+    fred = Fred(api_key=api_key)
+    frames = []
+    for code in codes:
+        s = fred.get_series(code)
+        df = s.to_frame(name=code)
+        df.index.name = "Date"
+        if start or end:
+            df = df.loc[str(start or ""):str(end or "")]
+        frames.append(df)
+    out = pd.concat(frames, axis=1) if frames else pd.DataFrame()
+    return out.sort_index()
+
+def fred_transform(df: pd.DataFrame, kind: str) -> pd.DataFrame:
+    if kind == "level":
+        return df
+    if kind == "pct_change":
+        return df.pct_change().mul(100)
+    if kind == "yoy":
+        # 12-period pct change (works for monthly series)
+        return df.pct_change(12).mul(100)
+    return df
+
+# ----------------------
 # PAGE: OVERVIEW
+# ----------------------
 if page == "Overview":
     st.markdown('<p class="main-header">Quant Trading System Dashboard</p>', unsafe_allow_html=True)
     st.markdown("### End-to-End Automated Trading Platform")
@@ -131,7 +182,9 @@ if page == "Overview":
     fig.update_layout(height=400)
     st.plotly_chart(fig, use_container_width=True)
 
+# ----------------------
 # PAGE: DATA PIPELINE
+# ----------------------
 elif page == "Data Pipeline":
     st.markdown('<p class="main-header">Data Pipeline</p>', unsafe_allow_html=True)
     
@@ -187,7 +240,102 @@ elif page == "Data Pipeline":
         })
         st.dataframe(updates, hide_index=True, use_container_width=True)
 
+# ----------------------
+# PAGE: MACRO (FRED)  -- NEW
+# ----------------------
+elif page == "Macro (FRED)":
+    st.markdown('<p class="main-header">Macro (FRED)</p>', unsafe_allow_html=True)
+    st.caption("Live FRED data with optional transforms and CSV download")
+    
+    with st.sidebar:
+        st.subheader("FRED Settings")
+        st.write(f"FRED key loaded: {'✅' if bool(FRED_API_KEY) else '❌'}")
+        if not FRED_API_KEY:
+            st.info("Add FRED_API_KEY to your .env at the repo root and restart the app.")
+    
+    mode = st.radio("Mode", ["Preset", "Custom"], horizontal=True)
+    transform_kind = st.selectbox("Transform", ["level", "pct_change", "yoy"], index=0)
+    
+    c1, c2 = st.columns(2)
+    with c1:
+        start = st.date_input("Start", value=None)
+    with c2:
+        end = st.date_input("End", value=None)
+    
+    if mode == "Preset":
+        preset_names = list(FRED_PRESETS.keys())
+        default = ["CPI (All Urban Consumers)"]
+        select = st.multiselect("Choose series", preset_names, default=default)
+        codes = [FRED_PRESETS[n] for n in select] if select else []
+    else:
+        user_codes = st.text_input("Enter FRED series codes (comma-separated)", value="CPIAUCSL, UNRATE")
+        codes = [c.strip() for c in user_codes.split(",") if c.strip()]
+    
+    go_btn = st.button("Load Data", type="primary", disabled=(not codes) or (not FRED_API_KEY))
+    
+    if go_btn:
+        try:
+            raw_df = fred_fetch_many(FRED_API_KEY, tuple(codes), start=start or None, end=end or None)
+            tf_df = fred_transform(raw_df, transform_kind)
+            if tf_df.empty:
+                st.warning("No data returned for the selected series/date range.")
+            else:
+                st.success(f"Loaded {len(codes)} series. Rows: {len(tf_df)}")
+                
+                st.subheader("Data Preview")
+                st.dataframe(tf_df.tail(200), use_container_width=True)
+                
+                st.subheader("Chart")
+                fig = go.Figure()
+                for col in tf_df.columns:
+                    fig.add_trace(go.Scatter(x=tf_df.index, y=tf_df[col], mode="lines", name=col))
+                fig.update_layout(height=520, margin=dict(t=30, l=10, r=10, b=10))
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Downloads
+                d1, d2 = st.columns(2)
+                with d1:
+                    st.download_button(
+                        "Download transformed CSV",
+                        tf_df.to_csv(index=True).encode("utf-8"),
+                        file_name="fred_transformed.csv",
+                        mime="text/csv",
+                    )
+                with d2:
+                    st.download_button(
+                        "Download raw CSV",
+                        raw_df.to_csv(index=True).encode("utf-8"),
+                        file_name="fred_raw.csv",
+                        mime="text/csv",
+                    )
+                
+                # Latest metrics
+                st.subheader("Latest values")
+                clean = tf_df.dropna()
+                if not clean.empty:
+                    last = clean.iloc[-1]
+                    cols = st.columns(min(4, len(last)))
+                    for i, (name, val) in enumerate(last.items()):
+                        with cols[i % len(cols)]:
+                            st.metric(name, f"{val:,.2f}")
+                else:
+                    st.write("No non-NaN values to show yet. Try a different transform or longer date range.")
+        except Exception as e:
+            st.error(f"Error loading FRED data: {e}")
+    else:
+        st.write("Select series and click **Load Data** to fetch FRED data.")
+        st.markdown(
+            """
+            **Tips**
+            - Try presets: CPIAUCSL (CPI), UNRATE (Unemployment), FEDFUNDS (Fed Funds)
+            - *pct_change* = period-to-period % change
+            - *yoy* = 12-period % change (needs at least 13 observations)
+            """
+        )
+
+# ----------------------
 # PAGE: TECHNICAL ANALYSIS
+# ----------------------
 elif page == "Technical Analysis":
     st.markdown('<p class="main-header">Technical Analysis</p>', unsafe_allow_html=True)
     
@@ -236,7 +384,9 @@ elif page == "Technical Analysis":
                          xaxis_title='Date', yaxis_title='RSI', height=300)
     st.plotly_chart(fig_rsi, use_container_width=True)
 
+# ----------------------
 # PAGE: STRATEGY PERFORMANCE
+# ----------------------
 elif page == "Strategy Performance":
     st.markdown('<p class="main-header">Strategy Performance</p>', unsafe_allow_html=True)
     
@@ -295,7 +445,9 @@ elif page == "Strategy Performance":
         fig_bar.update_layout(height=300, showlegend=False)
         st.plotly_chart(fig_bar, use_container_width=True)
 
+# ----------------------
 # PAGE: LIVE TRADING
+# ----------------------
 elif page == "Live Trading":
     st.markdown('<p class="main-header">Live Trading</p>', unsafe_allow_html=True)
     
@@ -353,7 +505,9 @@ elif page == "Live Trading":
         })
         st.dataframe(orders, hide_index=True, use_container_width=True)
 
+# ----------------------
 # PAGE: SENTIMENT ANALYSIS
+# ----------------------
 elif page == "Sentiment Analysis":
     st.markdown('<p class="main-header">Market Sentiment Analysis</p>', unsafe_allow_html=True)
     
