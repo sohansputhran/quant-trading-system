@@ -104,7 +104,7 @@ with tabs[0]:
         else:
             show = df[["published_at","source","title","sentiment","url"]].copy()
             show["published_at"] = show["published_at"].dt.tz_convert(None)
-            st.dataframe(show, use_container_width=True)
+            st.dataframe(show, width='stretch')
 
 # ---------- FUTURE TABS ----------
 with tabs[1]:
