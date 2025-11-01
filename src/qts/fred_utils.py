@@ -1,11 +1,9 @@
 from __future__ import annotations
 import os
 import pandas as pd
-from dotenv import load_dotenv, find_dotenv
 from fredapi import Fred
 import streamlit as st
-
-load_dotenv(find_dotenv(usecwd=True))
+from qts.config import settings
 
 FRED_PRESETS = {
     "CPI (All Urban Consumers)": "CPIAUCSL",
@@ -19,8 +17,8 @@ def fred_key_loaded() -> bool:
     return bool(os.getenv("FRED_API_KEY", ""))
 
 @st.cache_data(ttl=60 * 60)
-def fred_fetch_many(api_key: str, codes: tuple[str, ...], start=None, end=None) -> pd.DataFrame:
-    fred = Fred(api_key=api_key)
+def fred_fetch_many(codes: tuple[str, ...], start=None, end=None) -> pd.DataFrame:
+    fred = Fred(api_key=settings.FRED_API_KEY)
     frames = []
     for code in codes:
         s = fred.get_series(code)
