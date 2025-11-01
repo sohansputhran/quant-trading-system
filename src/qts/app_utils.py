@@ -4,10 +4,6 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 import streamlit as st
-from dotenv import load_dotenv, find_dotenv
-
-# Load .env once, regardless of working dir
-load_dotenv(find_dotenv(usecwd=True))
 
 def set_page_config(title: str = "Quant Trading System"):
     st.set_page_config(
