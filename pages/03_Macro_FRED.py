@@ -10,7 +10,7 @@ st.caption("Live FRED data with optional transforms and CSV download")
 
 with st.sidebar:
     st.subheader("FRED Settings")
-    st.write(f"FRED key loaded: {'✅' if fred_key_loaded() else '❌'}")
+    st.write(f"FRED key loaded: {'True' if fred_key_loaded() else 'False'}")
     if not fred_key_loaded():
         st.info("Add FRED_API_KEY to your .env at the repo root and restart the app.")
 
@@ -35,8 +35,7 @@ go_btn = st.button("Load Data", type="primary", disabled=(not codes) or (not fre
 
 if go_btn:
     try:
-        api_key = os.getenv("FRED_API_KEY", "")
-        raw_df = fred_fetch_many(api_key, tuple(codes), start=start or None, end=end or None)
+        raw_df = fred_fetch_many(tuple(codes), start=start or None, end=end or None)
         tf_df = fred_transform(raw_df, transform_kind)
         if tf_df.empty:
             st.warning("No data returned for the selected series/date range.")
