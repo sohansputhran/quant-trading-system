@@ -93,6 +93,8 @@ All credentials and environment variables are handled via `.env` (never commit t
 
 Create a `.env` file in your project root:
 
+## Installation
+
 ```bash
 FRED_API_KEY=your_fred_key_here
 NEWS_API_KEY=your_newsapi_key_here
